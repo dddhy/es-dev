@@ -15,8 +15,6 @@ public class Test1 {
                 map.put(arr[i],1);
             }
         }
-
-
         String s = "";
         for (Map.Entry<String,Integer> entry: map.entrySet()){
             String key = entry.getKey();
