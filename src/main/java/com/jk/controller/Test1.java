@@ -6,7 +6,7 @@ import java.util.Map;
 public class Test1 {
 
     public static void main(String[] args) {
-        String[] arr = new String[]{"1","2","1","3","2","2","哈哈","哈哈1"};
+        String[] arr = new String[]{"1","2","1","3","2","2","哈哈","哈哈2"};
         HashMap<String, Integer> map = new HashMap<>();
         for (int i = 0; i<arr.length ; i++){
             if(map.get(arr[i])!=null){
