@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta charset="UTF-8">
+    <!-- 引入jquery -->
+    <script type="text/javascript" src="../djs/jquery.min.js"></script>
+
+
+    <!-- 引入bootstrap的css -->
+    <link  href="../djs/bootstrap/css/bootstrap.min.css" rel="stylesheet" >
+    <!-- 引入bootstrap-treeview的css -->
+    <link  href="../djs/treeview/bootstrap-treeview.min.css" rel="stylesheet" >
+    <!-- 引入bootstrap-addTabs的css -->
+    <link  href="../djs/addTabs/addTabs.css" rel="stylesheet" >
+    <!-- 引入bootstrap-table的css -->
+    <link  href="../djs/table/bootstrap-table.min.css" rel="stylesheet" >
+    <!-- 引入fileinput的css -->
+    <link type="text/css" rel="stylesheet" href="../djs/fileinput/css/fileinput.min.css" />
+
+
+
+
+    <!-- 引入my97 -->
+    <script type="text/javascript" src="../djs/my97/WdatePicker.js"></script>
+    <!-- 引入bootstrap的js-->
+    <script type="text/javascript" src="../djs/bootstrap/js/bootstrap.min.js"></script>
+    <!-- 引入bootstrap的js-->
+    <script type="text/javascript" src="../djs/treeview/bootstrap-treeview.min.js"></script>
+    <!-- 引入bootstrap的js-->
+    <script type="text/javascript" src="../djs/addTabs/addTabs.js"></script>
+    <!-- 引入bootstrap-table的js-->
+    <script type="text/javascript" src="../djs/table/bootstrap-table.min.js"></script>
+    <script type="text/javascript" src="../djs/table/locale/bootstrap-table-zh-CN.min.js"></script>
+    <!-- 引入bootbox.js -->
+    <script type="text/javascript" src="../djs/bootbox/bootbox.js"></script>
+    <!-- 引入fileinput的js -->
+    <script type="text/javascript" src="../djs/fileinput/js/fileinput.min.js"></script>
+    <!--  引入fileinput的js -->
+    <script type="text/javascript" src="../djs/fileinput/js/locales/zh.js"></script>
+
+    <script type="text/javascript" src="../djs/fileinput/themes/fa/theme.js"></script>
+
+</head>
+<body>
+<div id="u7932_text" class="text ">
+    <p><span>角色</span></p>
+</div>
+
+
+<form id="pro_from" class="form-inline">
+    <div class="form-group">
+
+        <input type="text" class="form-control" name = "bname" id="name" placeholder="用户名字">
+    </div>
+
+    <button type="button" class="btn btn-success" onclick="queryData()">搜索</button>
+
+
+</form>
+<button type="button" class="btn btn-Warning btn-lg" onclick="addUser()">新增</button>
+<!--<button type="button"  class="btn btn-info btn-lg" onclick="deleteUserById()">批量删除</button>-->
+<table id="dataGrid"></table>
+
+<div class="modal fade" id="myModal3" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel" aria-hidden="true">
+
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <!-- 头部 -->
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"
+                        aria-hidden="true">&times;</button>  <!-- X号关闭 -->
+                <h4 class="modal-title" id="myModalLabel">菜单信息</h4>
+            </div>
+            <!-- 中部   form内容设置  -->
+            <div  id="yonghu">
+            </div>
+            <!-- 尾部 （按扭）-->
+            <div class="modal-footer">
+                <button type="button" onclick="tijiao()" class="btn btn-primary"> 提交更改</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div> <!-- /.modal-content -->
+    </div> <!-- /.modal-dialog -->
+</div>
+
+</body>
+
+<script>
+
+    $(function () {
+
+        //加载数据
+        initDataGrid();
+
+    })
+    function initDataGrid() {
+        //创建bootstrapTable
+
+        $("#dataGrid").bootstrapTable({
+            url: "../book/queryBook",
+            method: 'get',
+            striped: true,  	// 斑马线效果     默认false
+            //只允许选中一行
+            singleSelect: true,
+            //选中行是不选中复选框或者单选按钮
+            clickToSelect: true,
+            showToggle: true,                    //是否显示详细视图和列表视图的切换按钮
+            cardView: false,                    //是否显示详细视图
+            uniqueId: "id",                 //每一行的唯一标识，一般为主键列
+            showColumns: true,                  //是否显示所有的列
+            showRefresh: true,                  //是否显示刷新按钮
+            minimumCountColumns: 2,     //  最少留两列
+            detailView: false,                  //是否显示父子表
+            toolbar: '#tabToolBar',   //  工具定义位置
+            sidePagination: 'server',
+            toolbar: '#toolbar',
+            pagination: true, //是否展示分页
+            pageList: [2, 4, 8, 10],//分页组件
+            pageNumber: 1,
+            pageSize: 2,//默认每页条数
+            //启动回车键做搜索功能
+            searchOnEnterKey: true,
+            //设置为false 将禁止所有列的排序。
+            sortable: true,
+            //设置默认排序为 name
+            sortName: 'id',
+            //定义排序方式，'asc' 或者 'desc'。
+            sortOrder: "desc",
+            //设置为undefined可以获取pageNumber，pageSize，searchText，sortName，sortOrder
+            // 设置为limit可以获取limit, offset, search, sort, order  queryParamsType:'undefined',
+            queryParamsType: 'undefined',
+            // 请求服务器数据
+            queryParams: function queryParams(params) {
+                var param = {
+                    pageNumber: params.pageNumber,
+                    pageSize: params.pageSize,
+                    sortName: params.sortName,
+                    sortOrder: params.sortOrder,
+                    key: $("#name").val()
+                };
+                return param;
+            },
+            columns: [
+                {field: 'id', title: '序号', width: 300},
+                /*                {field: 'email', title: '邮箱', width: 300},*/
+                {field: 'bname', title: '姓名', width: 300},      //  列    field   代表是 后台  传过来的值
+                {field: 'price', title: '手机号', width: 300},
+                {field: 'btype', title: '角色名称', width: 300},      //  列    field   代表是 后台  传过来的值
+                {field: 'bjianjie', title: '登录次数', width: 300},
+                {field: 'cz', title: '操作', width: 300,
+                    formatter:function(value,row,index){
+                        var a = "<a href='javaScript:deleteBook(\""+row.id+"\")'>删除</a>";
+                        a += "   <a href='javaScript:updateBook(\""+row.id+"\")'>修改</a>";
+                        return a;
+                    }
+                }
+
+            ]
+        });
+    }
+    //条件查询
+    function queryData() {
+        var aa = $("input[name = 'danxuan']:checked").val();
+        //alert($("#name").val())
+        $("#dataGrid").bootstrapTable("refresh", {
+            "query": {
+
+                //"bname": $("#name").val()
+            }
+        });
+
+    }
+
+    function deleteBook(id) {
+
+        $.ajax({
+            url: '../book/deleteBook',
+            type: 'post',
+            data:{id:id},
+            success: function () {
+                alert("删除成功");
+                $('#dataGrid').bootstrapTable("refresh");
+                //刷新表格
+            }, error: function () {
+                alert("失败");
+            }
+        });
+    }
+
+    function down(id) {
+        $.ajax({
+            url: '../dhy/down',
+            type: 'post',
+            data:{id:id},
+            success: function () {
+                alert("修改成功");
+                $('#dataGrid').bootstrapTable("refresh");
+                //刷新表格
+            }, error: function () {
+                alert("失败");
+            }
+        });
+
+    }
+
+    function up(id) {
+        $.ajax({
+            url: '../dhy/up',
+            type: 'post',
+            data:{id:id},
+            success: function () {
+                alert("修改成功");
+                $('#dataGrid').bootstrapTable("refresh");
+                //刷新表格
+            }, error: function () {
+                alert("失败");
+            }
+        });
+
+    }
+
+    //绑定菜单
+    var roles;
+    function upd(id){
+        roles=id;
+        $.ajax({
+            url: "../dhy/getPerById?id="+id,
+            type: "post",
+            //  dataType: "json",
+            success: function (data) {
+                $("#myModal3").modal("show");
+                //查询成功回调，tree展示
+                $("#yonghu").treeview({
+                    //data属性 树节点信息 json数组
+                    data: data,
+                    //是否显示复选框
+                    showCheckbox : true,
+
+                    checked:true,
+                })
+            },
+            error:function(){
+                alert("fail");
+            }
+        })
+    }
+
+    function  tijiao(){
+        var ids=caidanid();
+        /*    alert(ids)
+            alert(roles)*/
+        $.ajax({
+            url:"../dhy/updateRole",
+            type:"post",
+            data:{ids:ids,id:roles},
+            success:function(){
+                $('#myModal3').modal('hide'); //成功后关闭弹框
+                $('#dataGrid').bootstrapTable("refresh");
+            }
+        })
+    }
+
+    //获取选中id
+    function caidanid(){
+        var id=  $("#yonghu").treeview("getChecked") //获取所选中的id
+        var ids="";
+        for (var i = 0; i < id.length; i++) {
+            ids +="," + id[i].id;
+        }
+        var ids=ids.substr(1);
+        return  ids;  //调用此方法时返回获得id
+    }
+
+
+
+
+
+
+
+    var res;
+
+    function createAddContent(url) {
+        $.ajax({
+            url: url,
+            async: false,
+            success: function (data) {
+                res = data;
+            }
+        });
+        return res;
+    }
+
+
+
+
+    //新增
+
+    function addUser(){
+        alert("试试");
+        //打开新增弹框
+        bootbox.dialog({
+            title: '新增用户',
+            message: createAddContent("../book/toAddBookPage"),
+            closeButton: true,//是否显示关闭按钮
+            type:'post',
+            buttons: {
+                "success": {
+                    "label": "<i class='icon-ok'></i> 保存",
+                    "className": "btn-sm btn-success",
+                    "callback": function () {
+                        $.ajax({
+                            url: '/book/addBook',
+                            type: 'post',
+                            data: $("#formId").serialize(),
+                            success: function () {
+                                alert("新增成功");
+                                $('#dataGrid').bootstrapTable("refresh");
+                                //刷新表格
+                            }, error: function () {
+                                alert("新增失败");
+                            }
+                        });
+                    }
+                },
+                "cancel": {
+                    "label": "<i class='icon-info'></i> 取消",
+                    "className": "btn-sm btn-danger",
+                    "callback": function () {
+
+                    }
+                }
+            }
+
+        });
+
+
+    }
+
+    //绑定角色
+    function editqx(id){
+        bootbox.dialog({
+            title: '绑定角色',
+            message: createAddContent("../dhy/queryRoleById?id="+id),
+            closeButton: true,//是否显示关闭按钮
+            buttons: {
+                "success": {
+                    "label": "<i class='icon-ok'></i> 保存",
+                    "className": "btn-sm btn-success",
+                    "callback": function () {
+                        var ids=$("[name='role']:checked").val()
+                        $.ajax({
+                            url:"../dhy/updateRole2",
+                            type:"post",
+                            data:{"id":$("#uid").val(),"ids":ids},
+                            success:function(){
+                                $('#myModal3').modal('hide'); //成功后关闭弹框
+                                $('#dataGrid').bootstrapTable("refresh");
+                            }
+                        })
+                    }
+                },
+                "cancel": {
+                    "label": "<i class='icon-info'></i> 取消",
+                    "className": "btn-sm btn-danger",
+                    "callback": function () {
+                    }
+                }
+            }
+        });
+    }
+
+
+
+
+    //绑定角色
+    function add(id){
+        //打开新增弹框
+        bootbox.dialog({
+            title: '用户详细信息',
+            message: createAddContent("../dhy/queryPerById?id="+id),
+            closeButton: true,//是否显示关闭按钮
+            buttons: {
+                "success": {
+                    "label": "<i class='icon-ok'></i> 修改",
+                    "className": "btn-sm btn-success",
+                    "callback": function () {
+                        $.ajax({
+                            url: '../dhy/UpdateUser',
+                            type: 'post',
+                            data: $("#addFormId").serialize(),
+                            success: function (flag) {
+                                alert("修改成功");
+                                $('#dataGrid3').bootstrapTable("refresh");
+                            }, error: function () {
+                                alert("修改失败");
+                            }
+                        });
+                    }
+                },
+                "cancel": {
+                    "label": "<i class='icon-info'></i> 取消",
+                    "className": "btn-sm btn-danger",
+                    "callback": function () {
+                    }
+                }
+            }
+        });
+    }
+
+
+    //修改
+    updateBook = function(id){
+        alert(id)
+        bootbox.dialog({
+
+            title:'修改用户',
+            message:createAddContent("../book/queryBookbyid?id="+id),
+            closeButton:true,
+            buttons: {
+                "success": {
+                    "label": "<i class='icon-ok'></i> 保存",
+                    "className": "btn-sm btn-success",
+                    "callback": function () {
+                        alert($("#formId").serialize())
+                        $.ajax({
+                            url: '../book/updateBook',
+                            type:'post',
+                            cache:false,
+                            data:$("#formId").serialize(),
+                            success: function () {
+                      /*          location.href = location;*/
+                                $('#dataGrid').bootstrapTable("refresh");
+                            }, error: function () {
+                                alert("失败");
+                            }
+                        });
+                    }
+                },
+                "cancel": {
+                    "label": "<i class='icon-info'></i> 取消",
+                    "className": "btn-sm btn-danger",
+                    "callback": function () {
+
+                    }
+                }
+            }
+        })
+    }
+
+
+</script>
+
+</html>
